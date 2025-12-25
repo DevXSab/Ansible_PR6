@@ -1,0 +1,40 @@
+---
+- name: Install and start Docker on app servers
+  hosts: app
+  become: true
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Enable and start Docker
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+
+- name: Install and start PostgreSQL on database servers
+  hosts: database
+  become: true
+  tasks:
+    - name: Install PostgreSQL
+      apt:
+        name: "postgresql-{{ postgres_version }}"
+        update_cache: yes
+        state: present
+
+    - name: Ensure PostgreSQL service is running
+      systemd:
+        name: postgresql
+        enabled: yes
+        state: started
